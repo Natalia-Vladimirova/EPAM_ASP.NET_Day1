@@ -13,10 +13,10 @@ namespace Task1
         public static double CountRoot(double value, int rootDegree)
         {
             if (rootDegree <= 0)
-                return double.NaN;
+                throw new ArgumentException();
 
             if ((value < 0) && (rootDegree % 2 == 0))
-                return double.NaN;
+                throw new ArgumentException();
 
             if (value == 0)
                 return 0;
