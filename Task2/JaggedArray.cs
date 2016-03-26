@@ -8,15 +8,16 @@ namespace Task2
 {
     #region interfaces
 
-    public interface ISortOrder
-    {
-        int SortingMethod(int x, int y);
-    }
-
     public interface ISortFeature
     {
-        int FindSortFeature(int[] array);
+        int CompareByFeature(int[] array1, int[] array2);
     }
+
+    #endregion
+
+    #region delegates
+
+    public delegate int CompareByFeatureDelegate(int[] array1, int[] array2);
 
     #endregion
 
@@ -24,27 +25,21 @@ namespace Task2
 
     public static class JaggedArray
     {
-        public static void SortJaggedArray(int[][] array, ISortOrder sortOrder, ISortFeature sortFeature)
+        public static void SortJaggedArray(int[][] array, ISortFeature comparer)
         {
-            if (array == null) { throw new ArgumentNullException(); }
-
-            if (sortOrder == null) { throw new ArgumentNullException(); }
-
-            if (sortFeature == null) { throw new ArgumentNullException(); }
+            if (array == null) { throw new ArgumentNullException("Null array"); }
+            if (comparer == null) { throw new ArgumentNullException("Null comparer"); }
 
             for (int i = 0; i < array.Length - 1; i++)
             {
                 for (int j = 0; j < array.Length - i - 1; j++)
                 {
-                    if ((array[j] == null) || (array[j + 1] != null && array[j + 1].Length == 0) ||
-                        (array[j + 1] != null && array[j].Length != 0 &&
-                        sortOrder.SortingMethod(sortFeature.FindSortFeature(array[j]), sortFeature.FindSortFeature(array[j + 1])) > 0))
+                    if (comparer.CompareByFeature(array[j], array[j + 1]) > 0)
                     {
                         Swap(ref array[j], ref array[j + 1]);
                     }
                 }
             }
-
         }
 
         private static void Swap(ref int[] firstItem, ref int[] secondItem)
@@ -57,34 +52,44 @@ namespace Task2
 
     #endregion
 
-    #region sort order
-
-    public class AscendingSortOrder : ISortOrder
-    {
-        // ascending method
-        public int SortingMethod(int x, int y)
-        {
-            return x > y ? 1 : x == y ? 0 : -1;
-        }
-    }
-
-    public class DescendingSortOrder : ISortOrder
-    {
-        // descending method
-        public int SortingMethod(int x, int y)
-        {
-            return x < y ? 1 : x == y ? 0 : -1;
-        }
-    }
-
-    #endregion
-
     #region sort features
 
-    public class RowSumSortFeature : ISortFeature
+    public class RowSumAscSorter : ISortFeature
     {
         // sort feature: row sum
-        public int FindSortFeature(int[] array)
+        public int CompareByFeature(int[] array1, int[] array2)
+        {
+            if (array1 == null && array2 == null)
+            { return 0; }
+
+            if (array1 == null)
+            { return 1; }
+            
+            if(array2 == null)
+            { return -1; }
+
+            if (array1.Length == 0 && array2.Length == 0)
+            { return 0; }
+
+            if (array1.Length == 0)
+            { return 1; }
+
+            if (array2.Length == 0)
+            { return -1; }
+
+            int arrayRowSum1 = CountRowSum(array1);
+            int arrayRowSum2 = CountRowSum(array2);
+
+            if (arrayRowSum1 < arrayRowSum2)
+            { return -1; }
+
+            if (arrayRowSum1 == arrayRowSum2)
+            { return 0; }
+
+            return 1;
+        }
+
+        private int CountRowSum(int[] array)
         {
             int result = 0;
             for (int i = 0; i < array.Length; i++)
@@ -93,10 +98,42 @@ namespace Task2
         }
     }
 
-    public class MaxElemModuleSortFeature : ISortFeature
+    public class MaxElemModuleDescSorter : ISortFeature
     {
         // sort feature: max module of element
-        public int FindSortFeature(int[] array)
+        public int CompareByFeature(int[] array1, int[] array2)
+        {
+            if (array1 == null && array2 == null)
+            { return 0; }
+
+            if (array1 == null)
+            { return 1; }
+
+            if (array2 == null)
+            { return -1; }
+
+            if (array1.Length == 0 && array2.Length == 0)
+            { return 0; }
+
+            if (array1.Length == 0)
+            { return 1; }
+
+            if (array2.Length == 0)
+            { return -1; }
+
+            int maxElemModule1 = FindMaxElemModule(array1);
+            int maxElemModule2 = FindMaxElemModule(array2);
+
+            if (maxElemModule1 > maxElemModule2)
+            { return -1; }
+
+            if (maxElemModule1 == maxElemModule2)
+            { return 0; }
+
+            return 1;
+        }
+
+        private int FindMaxElemModule(int[] array)
         {
             int max = Math.Abs(array[0]);
             for (int i = 1; i < array.Length; i++)

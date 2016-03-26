@@ -41,6 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="JaggedArray.cs" />
+    <Compile Include="JaggedArrayViaDelegate.cs" />
+    <Compile Include="JaggedArrayViaInterface.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
