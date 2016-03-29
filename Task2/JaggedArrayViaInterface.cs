@@ -6,28 +6,11 @@ using System.Threading.Tasks;
 
 namespace Task2
 {
-    class JaggedArrayWithDelegate : ISortFeature
-    {
-        private CompareByFeatureDelegate compareByFeature;
-
-        public JaggedArrayWithDelegate(CompareByFeatureDelegate compareByFeature)
-        {
-            this.compareByFeature = compareByFeature;
-        }
-
-        public int CompareByFeature(int[] array1, int[] array2)
-        {
-            return compareByFeature(array1, array2);
-        }
-    }
-
     public static class JaggedArrayViaInterface
     {
-        public static void SortJaggedArray(int[][] array, CompareByFeatureDelegate compareByFeature)
+        public static void SortJaggedArray(int[][] array, CompareByFeatureDelegate compareDelegate)
         {
-            if (compareByFeature == null) { throw new ArgumentNullException("Null compare method"); }
-            
-            SortJaggedArray(array, new JaggedArrayWithDelegate(compareByFeature));
+            SortJaggedArray(array, new JaggedArrayAdapter(compareDelegate));
         }
 
         public static void SortJaggedArray(int[][] array, ISortFeature comparer)
@@ -52,6 +35,23 @@ namespace Task2
             int[] temp = firstItem;
             firstItem = secondItem;
             secondItem = temp;
+        }
+
+        private class JaggedArrayAdapter : ISortFeature
+        {
+            private CompareByFeatureDelegate compareDelegate;
+
+            public JaggedArrayAdapter(CompareByFeatureDelegate compareDelegate)
+            {
+                if (compareDelegate == null)
+                {
+                    throw new ArgumentNullException("Null compare method");
+                }
+                this.compareDelegate = compareDelegate;
+            }
+
+            public int CompareByFeature(int[] array1, int[] array2) => 
+                compareDelegate(array1, array2);           
         }
     }
 
